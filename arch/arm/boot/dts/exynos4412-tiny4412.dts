@@ -123,6 +123,13 @@
 	cap-mmc-highspeed;
 };
 
+&pwm {
+	pinctrl-0 = <&pwm0_out>;
+	pinctrl-names = "default";
+	samsung,pwm-outputs = <0>;
+	status = "okay";
+};
+
 &serial_0 {
 	status = "okay";
 };
