@@ -105,6 +105,28 @@ struct samsung_pwm_chip {
 static DEFINE_SPINLOCK(samsung_pwm_lock);
 #endif
 
+#if 0
+static inline void dump_reg(struct samsung_pwm_chip *chip)
+{
+	u32 tcon, tcfg0, tcfg1, tcntb0, tcmpb0;
+
+	tcon = readl(chip->base + REG_TCON);
+	tcfg1 = readl(chip->base + REG_TCFG1);
+	tcfg0 = readl(chip->base + REG_TCFG0);
+	tcntb0 = readl(chip->base + REG_TCNTB(0));
+	tcmpb0 = readl(chip->base + REG_TCMPB(0));
+
+	printk("base clk: %lu Hz\n", clk_get_rate(chip->base_clk));
+	printk("tcon:   0x%x\n", tcon);
+	printk("tcfg0:  0x%x\n", tcfg0);
+	printk("tcfg1:  0x%x\n", tcfg1);
+	printk("tcntb0: 0x%x\n", tcntb0);
+	printk("tcmpb0: 0x%x\n", tcmpb0);
+}
+#else
+#define dump_reg(x)
+#endif
+
 static inline
 struct samsung_pwm_chip *to_samsung_pwm_chip(struct pwm_chip *chip)
 {
@@ -250,6 +272,8 @@ static int pwm_samsung_enable(struct pwm_chip *chip, struct pwm_device *pwm)
 
 	spin_unlock_irqrestore(&samsung_pwm_lock, flags);
 
+	dump_reg(our_chip);
+
 	return 0;
 }
 
@@ -267,6 +291,8 @@ static void pwm_samsung_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 	writel(tcon, our_chip->base + REG_TCON);
 
 	spin_unlock_irqrestore(&samsung_pwm_lock, flags);
+
+	dump_reg(our_chip);
 }
 
 static void pwm_samsung_manual_update(struct samsung_pwm_chip *chip,
@@ -295,6 +321,7 @@ static int pwm_samsung_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	struct samsung_pwm_channel *chan = pwm_get_chip_data(pwm);
 	u32 tin_ns = chan->tin_ns, tcnt, tcmp, oldtcmp;
 
+	dev_dbg(chip->dev, "%s enter, duty_ns: %d, period_ns: %d\n", __func__, duty_ns, period_ns);
 	/*
 	 * We currently avoid using 64bit arithmetic by using the
 	 * fact that anything faster than 1Hz is easily representable
@@ -369,6 +396,8 @@ static int pwm_samsung_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	chan->tin_ns = tin_ns;
 	chan->duty_ns = duty_ns;
 
+	dump_reg(our_chip);
+
 	return 0;
 }
 
@@ -394,6 +423,8 @@ static void pwm_samsung_set_invert(struct samsung_pwm_chip *chip,
 	writel(tcon, chip->base + REG_TCON);
 
 	spin_unlock_irqrestore(&samsung_pwm_lock, flags);
+
+	dump_reg(chip);
 }
 
 static int pwm_samsung_set_polarity(struct pwm_chip *chip,

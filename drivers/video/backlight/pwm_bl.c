@@ -81,10 +81,22 @@ static int compute_duty_cycle(struct pwm_bl_data *pb, int brightness)
 	unsigned int lth = pb->lth_brightness;
 	int duty_cycle;
 
+#if 0
+	printk("%s enter.\n", __func__);
+	printk("levels : %p\n", pb->levels);
+	printk("period : %d\n", pb->period);
+	printk("lth :    %d\n", lth);
+	printk("scale :  %d\n", pb->scale);
+#endif
+
 	if (pb->levels)
 		duty_cycle = pb->levels[brightness];
 	else
 		duty_cycle = brightness;
+#if 0
+	printk("duty_cycle: %d\n", duty_cycle);
+	printk("return %d\n", (duty_cycle * (pb->period - lth) / pb->scale) + lth);
+#endif
 
 	return (duty_cycle * (pb->period - lth) / pb->scale) + lth;
 }
