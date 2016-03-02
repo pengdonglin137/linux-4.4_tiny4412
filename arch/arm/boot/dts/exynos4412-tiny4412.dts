@@ -16,6 +16,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/usb4640/usb4640.h>
 #include <dt-bindings/pwm/pwm.h>
+#include <autoconf.h>
 
 / {
 	model = "FriendlyARM TINY4412 board based on Exynos4412";
@@ -103,6 +104,31 @@
 		   pinctrl-names = "default";
 #endif
 	};
+
+#ifdef CONFIG_MMA7660_USE_I2C_GPIO
+	i2c_mma7660: i2c-gpio-0 {
+		compatible = "i2c-gpio";
+		gpios = <&gpa1 2 GPIO_ACTIVE_HIGH>,    /* SDA */
+			<&gpa1 3 GPIO_ACTIVE_HIGH>;    /* SCL */
+		/* i2c-gpio,sda-open-drain; */
+		/* i2c-gpio,scl-open-drain; */
+		i2c-gpio,delay-us = <2>;  /* 250 kHz  */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "okay";
+
+		mma7660@4c {
+			compatible = "freescale,mma7660";
+			reg = <0x4c>;
+			interrupt-parent = <&gpx3>;
+			interrupts = <1 2>;
+			poll_interval = <100>;
+			input_fuzz = <4>;
+			input_flat = <4>;
+			status = "okay";
+		};
+	};
+#endif
 };
 
 &rtc {
@@ -186,4 +212,27 @@
 &hsotg {
 	status = "okay";
 };
+
+#ifndef CONFIG_MMA7660_USE_I2C_GPIO
+/* MMA7660FC  */
+&i2c_3 {
+	samsung,i2c-sda-delay = <100>;
+	samsung,i2c-slave-addr = <0x10>;
+	samsung,i2c-max-bus-freq = <200000>;
+	pinctrl-0 = <&i2c3_bus>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	mma7660@4c {
+		compatible = "freescale,mma7660";
+		reg = <0x4c>;
+		interrupt-parent = <&gpx3>;
+		interrupts = <1 2>;
+		poll_interval = <100>;
+		input_fuzz = <4>;
+		input_flat = <4>;
+		status = "okay";
+	};
+};
+#endif
 

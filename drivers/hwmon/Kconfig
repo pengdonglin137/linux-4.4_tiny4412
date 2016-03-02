@@ -1757,6 +1757,22 @@ config SENSORS_ULTRA45
 	  This driver provides support for the Ultra45 workstation environmental
 	  sensors.
 
+config SENSORS_MMA7660
+	tristate "Freescale MMA7660 Accelerometer"
+	depends on I2C
+	default n
+	help
+	  This driver provides Support for the 3-Axis Orientation/Motion
+	  Detection Sensor - MMA7660 of Freescale Semiconductor.
+
+config MMA7660_USE_I2C_GPIO
+	bool "Use i2c-gpio to control mma7660"
+	depends on SENSORS_MMA7660
+	default n
+	help
+	  We have two ways to realize I2C controller to control mma7660,here we use
+	  i2c-gpio.
+
 if ACPI
 
 comment "ACPI drivers"
