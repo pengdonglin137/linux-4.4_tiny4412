@@ -586,19 +586,11 @@ static void edac_mc_workq_setup(struct mem_ctl_info *mci, unsigned msec,
  */
 static void edac_mc_workq_teardown(struct mem_ctl_info *mci)
 {
-	int status;
+	mci->op_state = OP_OFFLINE;
 
-	if (mci->op_state != OP_RUNNING_POLL)
-		return;
-
-	status = cancel_delayed_work(&mci->work);
-	if (status == 0) {
-		edac_dbg(0, "not canceled, flush the queue\n");
-
-		/* workq instance might be running, wait for it */
+	cancel_delayed_work_sync(&mci->work);
 		flush_workqueue(edac_workqueue);
 	}
-}
 
 /*
  * edac_mc_reset_delay_period(unsigned long value)
