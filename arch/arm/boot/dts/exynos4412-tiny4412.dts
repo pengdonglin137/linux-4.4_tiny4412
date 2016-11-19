@@ -27,6 +27,12 @@
 		bootargs = "root=/dev/ram0 rw rootfstype=ext4 console=ttySAC0,115200 ethmac=1C:6F:65:34:51:7E init=/linuxrc";
 	};
 
+	aliases {
+#ifdef CONFIG_MMA7660_USE_I2C_GPIO
+		i2c9 = &i2c_mma7660;
+#endif
+        };
+
 	memory {
 		reg = <0x40000000 0x40000000>;
 	};
@@ -103,6 +109,7 @@
 		   pinctrl-0 = <&pwm0_out>;
 		   pinctrl-names = "default";
 #endif
+                   status = "disabled";
 	};
 
 #ifdef CONFIG_MMA7660_USE_I2C_GPIO
